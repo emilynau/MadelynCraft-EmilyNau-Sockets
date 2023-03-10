@@ -314,6 +314,10 @@ const updateNominationsRemainingUI = (newNominationsRemaining) => {
  */
 function voteForPokemon(pokemon, upvote) {
 	// your code goes here!
+	if (username.length > 0 && id != null) {
+		socket.send(JSON.stringify({type: "VOTE",candidate: pokemon,voter: id,upvote: upvote
+		}));
+	}
 }
 
 /**
@@ -324,7 +328,15 @@ function voteForPokemon(pokemon, upvote) {
  */
 function nominatePokemon(pokemon, nominate) {
 	// your code goes here!
-}
+	b = true
+	if (nominate) {
+		b = false
+	}
+	if (username.length > 0 && id != null) {
+		socket.send(JSON.stringify({type: "NOMINATE",nominee: pokemon,nominater: id,unnominate: b
+		}))
+	}
+}	
 
 /**
  * TODO: Complete the rest of the functionality for this function!
@@ -341,7 +353,7 @@ function connect() {
 		 * TODO: Write a line here opening a socket connection with the server, and assign
 		 * it to the socket variable!
 		 */
-
+		socket = new WebSocket(URL)
 		
 		// heartbeat functionality - do NOT touch! D:<
 		socket.onopen = () => {
@@ -371,17 +383,12 @@ function connect() {
 			// TODO: handle both the "NOMINEES" event, and the "UPDATE" event
 			switch (eventData.type) {
 				case "NOMINEES": {
-					/**
-					 * TODO: Write logic here handling when the client
-					 * receives a "NOMINEES" event from the server
-					 */
+					updateNominees(eventData.nominees);
 					break;
 				}
 				case "UPDATE": {
-					/**
-					 * TODO: Write logic here handling when the client
-					 * receives a "UPDATE" event from the server
-					 */
+					updateVotesRemainingUI(eventData.user.votes)
+					updateNominationsRemainingUI(eventData.user.nominations)
 					break;
 				}
 				case "GREET": {
